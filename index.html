@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Neon Tap - Futuristic Tap Game</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Background Effects -->
+        <div class="bg-effects">
+            <div class="bg-orb orb-1"></div>
+            <div class="bg-orb orb-2"></div>
+            <div class="bg-orb orb-3"></div>
+            <div class="grid-overlay"></div>
+        </div>
+
+        <!-- Anonymous Mode Indicator -->
+        <div class="anonymous-indicator" id="anonymousIndicator">ANONYMOUS MODE</div>
+        
+        <!-- 2 Player Mode Indicator -->
+        <div class="twoplayer-indicator" id="twoplayerIndicator">2 PLAYER MODE</div>
+        
+        <!-- 2 Player Mode Indicator -->
+        <div class="twoplayer-indicator" id="twoplayerIndicator">2 PLAYER MODE</div>
+
+        <!-- Top HUD Bar -->
+        <div class="hud-bar">
+            <div class="hud-item score-display p1-score">
+                <span class="hud-label"><span class="player-label">P1</span> SCORE</span>
+                <span class="hud-value" id="score">00000</span>
+            </div>
+            <div class="hud-item timer-display">
+                <span class="hud-label">
+                    <svg class="timer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12,6 12,12 16,14"/>
+                    </svg>
+                    TIME
+                </span>
+                <span class="hud-value" id="timer">10.0</span>
+            </div>
+            <div class="hud-item score-display p2-score hidden">
+                <span class="hud-label"><span class="player-label p2">P2</span> SCORE</span>
+                <span class="hud-value" id="scoreP2">00000</span>
+            </div>
+        </div>
+
+        <!-- Gameplay Area -->
+        <div class="gameplay-area">
+            <!-- Player 1 Zone -->
+            <div class="player-zone p1-zone" id="p1Zone">
+                <div class="player-zone-label">PLAYER 1</div>
+                <!-- Tap Target P1 -->
+                <div class="target-container" id="targetContainer">
+                    <div class="target-outer-ring"></div>
+                    <div class="target-middle-ring"></div>
+                    <div class="target-inner-ring"></div>
+                    <button class="tap-target" id="tapTarget" aria-label="Tap target Player 1">
+                        <div class="target-glow"></div>
+                        <div class="target-content">
+                            <svg class="tap-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9H15V22H13V16H11V22H9V9H3V7H21V9Z"/>
+                            </svg>
+                            <span class="tap-text">TAP NOW</span>
+                        </div>
+                        <div class="ripple-container" id="rippleContainer"></div>
+                    </button>
+                </div>
+
+                <!-- Combo Display P1 -->
+                <div class="combo-display" id="comboDisplay">
+                    <span class="combo-text">COMBO</span>
+                    <span class="combo-value" id="comboValue">x1</span>
+                </div>
+
+                <!-- Points Popup P1 -->
+                <div class="points-popup" id="pointsPopup"></div>
+            </div>
+            
+            <!-- Player 2 Zone -->
+            <div class="player-zone p2-zone hidden" id="p2Zone">
+                <div class="player-zone-label">PLAYER 2</div>
+                <!-- Tap Target P2 -->
+                <div class="target-container target-container-p2" id="targetContainerP2">
+                    <div class="target-outer-ring"></div>
+                    <div class="target-middle-ring"></div>
+                    <div class="target-inner-ring"></div>
+                    <button class="tap-target tap-target-p2" id="tapTargetP2" aria-label="Tap target Player 2">
+                        <div class="target-glow"></div>
+                        <div class="target-content">
+                            <svg class="tap-icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9H15V22H13V16H11V22H9V9H3V7H21V9Z"/>
+                            </svg>
+                            <span class="tap-text">TAP NOW</span>
+                        </div>
+                        <div class="ripple-container" id="rippleContainerP2"></div>
+                    </button>
+                </div>
+
+                <!-- Combo Display P2 -->
+                <div class="combo-display combo-display-p2" id="comboDisplayP2">
+                    <span class="combo-text">COMBO</span>
+                    <span class="combo-value" id="comboValueP2">x1</span>
+                </div>
+
+                <!-- Points Popup P2 -->
+                <div class="points-popup" id="pointsPopupP2"></div>
+            </div>
+        </div>
+
+        <!-- Bottom Control Panel -->
+        <div class="control-panel">
+            <button class="control-btn" id="menuBtn" aria-label="Menu">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 12h18M3 6h18M3 18h18"/>
+                </svg>
+            </button>
+            <button class="control-btn" id="restartBtn" aria-label="Restart">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                    <path d="M3 3v5h5"/>
+                </svg>
+            </button>
+            <button class="control-btn play-pause" id="playPauseBtn" aria-label="Play/Pause">
+                <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="5,3 19,12 5,21"/>
+                </svg>
+                <svg class="pause-icon hidden" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="6" y="4" width="4" height="16"/>
+                    <rect x="14" y="4" width="4" height="16"/>
+                </svg>
+            </button>
+            <button class="control-btn" id="soundBtn" aria-label="Toggle Sound">
+                <svg class="sound-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/>
+                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                </svg>
+                <svg class="sound-off hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/>
+                    <line x1="23" y1="9" x2="17" y2="15"/>
+                    <line x1="17" y1="9" x2="23" y2="15"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Game Over Modal -->
+        <div class="modal-overlay" id="gameOverModal">
+            <div class="modal-content">
+                <div class="modal-glow"></div>
+                <h2 class="modal-title">GAME OVER</h2>
+                <div class="modal-score" id="singlePlayerScore">
+                    <span class="modal-score-label">YOUR SCORE</span>
+                    <span class="modal-score-value" id="finalScore">00000</span>
+                </div>
+                <div class="modal-stats" id="singlePlayerStats">
+                    <div class="stat-item">
+                        <span class="stat-label">MAX COMBO</span>
+                        <span class="stat-value" id="maxCombo">x1</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">TOTAL TAPS</span>
+                        <span class="stat-value" id="totalTaps">0</span>
+                    </div>
+                </div>
+                
+                <!-- 2 Player Results (hidden by default) -->
+                <div class="two-player-results hidden" id="twoPlayerResults">
+                    <div class="winner-banner" id="winnerBanner">
+                        <span class="winner-text">PLAYER 1 WINS!</span>
+                    </div>
+                    <div class="players-comparison">
+                        <div class="player-result p1-result">
+                            <span class="player-result-label">PLAYER 1</span>
+                            <span class="player-result-score" id="p1FinalScore">00000</span>
+                            <div class="player-result-stats">
+                                <span>x<span id="p1MaxCombo">1</span> combo</span>
+                                <span><span id="p1TotalTaps">0</span> taps</span>
+                            </div>
+                        </div>
+                        <div class="vs-divider">VS</div>
+                        <div class="player-result p2-result">
+                            <span class="player-result-label">PLAYER 2</span>
+                            <span class="player-result-score" id="p2FinalScore">00000</span>
+                            <div class="player-result-stats">
+                                <span>x<span id="p2MaxCombo">1</span> combo</span>
+                                <span><span id="p2TotalTaps">0</span> taps</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button class="play-again-btn" id="playAgainBtn">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <polygon points="5,3 19,12 5,21"/>
+                        </svg>
+                        <span>PLAY AGAIN</span>
+                    </button>
+                    <button class="menu-return-btn" id="menuReturnBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 12h18M3 6h18M3 18h18"/>
+                        </svg>
+                        <span>MAIN MENU</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Menu Screen -->
+        <div class="menu-overlay" id="menuOverlay">
+            <div class="menu-content">
+                <div class="menu-logo">
+                    <div class="logo-glow"></div>
+                    <h1 class="game-title">NEON TAP</h1>
+                    <p class="game-subtitle">Tap as fast as you can!</p>
+                </div>
+                
+                <div class="menu-buttons">
+                    <button class="menu-btn primary" id="playNowBtn">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <polygon points="5,3 19,12 5,21"/>
+                        </svg>
+                        <span>PLAY NOW</span>
+                    </button>
+                    
+                    <button class="menu-btn" id="highScoreBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                        </svg>
+                        <span>HIGH SCORES</span>
+                    </button>
+                    
+                    <button class="menu-btn" id="settingsBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                        </svg>
+                        <span>SETTINGS</span>
+                    </button>
+                </div>
+                
+                <div class="menu-footer">
+                    <p>Version 1.0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- High Scores Screen -->
+        <div class="highscore-overlay hidden" id="highscoreOverlay">
+            <div class="highscore-content">
+                <div class="panel-header">
+                    <button class="back-btn" id="highscoreBackBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <h2 class="panel-title">HIGH SCORES</h2>
+                    <div class="header-spacer"></div>
+                </div>
+                
+                <div class="trophy-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                    </svg>
+                </div>
+                
+                <div class="scores-list" id="scoresList">
+                    <!-- Scores will be populated by JavaScript -->
+                </div>
+                
+                <button class="clear-scores-btn" id="clearScoresBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3,6 5,6 21,6"/>
+                        <path d="M19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"/>
+                    </svg>
+                    <span>CLEAR ALL</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Settings Screen -->
+        <div class="settings-overlay hidden" id="settingsOverlay">
+            <div class="settings-content">
+                <div class="panel-header">
+                    <button class="back-btn" id="settingsBackBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <h2 class="panel-title">SETTINGS</h2>
+                    <div class="header-spacer"></div>
+                </div>
+                
+                <div class="settings-list">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/>
+                                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                            </svg>
+                            <div class="setting-text">
+                                <span class="setting-label">Sound Effects</span>
+                                <span class="setting-desc">Enable tap and game sounds</span>
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="soundToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                <circle cx="8.5" cy="8.5" r="1.5"/>
+                                <polyline points="21,15 16,10 5,21"/>
+                            </svg>
+                            <div class="setting-text">
+                                <span class="setting-label">Visual Effects</span>
+                                <span class="setting-desc">Enable glow and particle effects</span>
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="visualToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12,6 12,12 16,14"/>
+                            </svg>
+                            <div class="setting-text">
+                                <span class="setting-label">Game Duration</span>
+                                <span class="setting-desc">Select game time limit</span>
+                            </div>
+                        </div>
+                        <select class="duration-select" id="durationSelect">
+                            <option value="10">10 sec</option>
+                            <option value="15">15 sec</option>
+                            <option value="20">20 sec</option>
+                            <option value="30">30 sec</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                            </svg>
+                            <div class="setting-text">
+                                <span class="setting-label">Difficulty</span>
+                                <span class="setting-desc">Target movement speed</span>
+                            </div>
+                        </div>
+                        <select class="duration-select" id="difficultySelect">
+                            <option value="easy">Easy</option>
+                            <option value="normal" selected>Normal</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-item anonymous-setting">
+                        <div class="setting-info">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M12 16v-4M12 8h.01"/>
+                                <path d="M8 12a4 4 0 0 1 8 0" stroke-dasharray="2 2"/>
+                            </svg>
+                            <div class="setting-text">
+                                <span class="setting-label">Anonymous Mode</span>
+                                <span class="setting-desc">Target appears anywhere on screen</span>
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="anonymousToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item twoplayer-setting">
+                        <div class="setting-info">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                            <div class="setting-text">
+                                <span class="setting-label">2 Player Mode</span>
+                                <span class="setting-desc">Compete with a friend on same screen</span>
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="twoPlayerToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item twoplayer-setting">
+                        <div class="setting-info">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                            <div class="setting-text">
+                                <span class="setting-label">2 Player Mode</span>
+                                <span class="setting-desc">Compete with a friend on same screen</span>
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="twoPlayerToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="settings-footer">
+                    <button class="reset-settings-btn" id="resetSettingsBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                            <path d="M3 3v5h5"/>
+                        </svg>
+                        <span>Reset to Default</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pause Overlay -->
+        <div class="pause-overlay hidden" id="pauseOverlay">
+            <div class="pause-content">
+                <h2 class="pause-title">PAUSED</h2>
+                <p class="pause-subtitle">Tap play to continue</p>
+                <button class="pause-menu-btn" id="pauseMenuBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12h18M3 6h18M3 18h18"/>
+                    </svg>
+                    <span>Main Menu</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
